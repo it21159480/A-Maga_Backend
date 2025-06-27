@@ -72,6 +72,10 @@ Use Render, Railway, or Heroku. Set your environment variables and Mongo URI.
 
 ## 🔧 API Endpoints
 
+### 📬 API Documentation (Postman)
+You can test all endpoints using the following Postman collection:
+
+🔗 [View API in Postman](https://documenter.getpostman.com/view/27077121/2sB2xFeSwq)
 ### ✅ Auth
 
 | Method | Endpoint            | Description    |
@@ -167,7 +171,12 @@ if (req.user.role !== 'instructor') {
   return res.status(403).json({ message: 'Instructors only' });
 }
 ```
+```js
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ message: 'Access denied. Students only' }); // Access denied for non-students
+  }
 
+```
 ---
 
 ## ✅ Done
