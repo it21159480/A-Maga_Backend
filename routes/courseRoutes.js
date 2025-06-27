@@ -24,9 +24,11 @@ const {
   deleteCourse,
   enrollCourse,
   getAllCourses,
-  getEnrolledCourses
+  getEnrolledCourses,
+  getCourseRecommendationsAPI
 } = require('../controllers/courseController');
-const { protect, instructorOnly } = require('../middleware/auth');
+const { protect, instructorOnly, studentOnly } = require('../middleware/auth');
+
 
 const router = express.Router();
 
@@ -40,5 +42,8 @@ router.delete('/:id', protect, instructorOnly, deleteCourse);
 router.get('/', protect, getAllCourses); // View all courses
 router.post('/enroll/:id', protect, enrollCourse); // Enroll in a course
 router.get('/enrolled', protect, getEnrolledCourses); // View enrolled courses
+
+// Route to get course recommendations
+router.post('/recommend', protect, studentOnly ,getCourseRecommendationsAPI);
 
 module.exports = router;

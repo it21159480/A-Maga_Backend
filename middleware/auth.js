@@ -23,3 +23,10 @@ exports.instructorOnly = (req, res, next) => {
   }
   next();
 };
+
+exports.studentOnly = (req, res, next) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ message: 'Access denied. Students only' }); // Access denied for non-students
+  }
+  next(); // Allow the request to proceed if the user is a student
+};

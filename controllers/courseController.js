@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const { getCourseRecommendations, filterAvailableCourses, parseGeminiResponse } = require('../utils/gpthelper');
 
 exports.createCourse = async (req, res) => {
   const { title, description, content } = req.body;
@@ -110,3 +111,33 @@ exports.getEnrolledCourses = async (req, res) => {
     res.status(500).json({ message: 'Failed to retrieve enrolled courses', error: err.message });
   }
 };
+
+
+// Controller to get hybrid course recommendations
+exports.getCourseRecommendationsAPI = async (req, res) => {
+  const { query } = req.body; // Student's query (e.g., "What courses should I follow to become a software engineer?")
+
+  try {
+    // Step 1: Get Gemini response (raw recommendation)
+    const geminiResponse = await getCourseRecommendations(query);
+
+    // Step 2: Parse the Gemini response with word and course limits
+    const parsedResponse = parseGeminiResponse(geminiResponse, 100, 5); // 100 words max and 5 courses
+
+    // Step 3: Filter the Gemini response against available courses
+    const availableCourses = await filterAvailableCourses(parsedResponse.courses);
+
+    // Return both GPT-3 response and filtered courses to the client
+    res.status(200).json({
+      message: 'Here are your course recommendations:',
+      gptResponse: geminiResponse, // Display the raw GPT-3 response
+      availableCourses: availableCourses // Display the filtered available courses
+    });
+  } catch (err) {
+    if (err.message === 'API request limit exceeded') {
+      return res.status(429).json({ message: 'API request limit reached. Please try again later.' });
+    }
+    res.status(500).json({ message: err.message });
+  }
+};
+
